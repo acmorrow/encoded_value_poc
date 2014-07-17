@@ -38,17 +38,21 @@ protected:
     storage_type _storage;
 };
 
+class msg_hdr_cview : public msg_hdr_methods<const_pointer_storage_type> {
+public:
+    msg_hdr_cview(const char* base) {
+        _storage.bytes = base;
+    }
+};
+
 class msg_hdr_view : public msg_hdr_methods<pointer_storage_type> {
 public:
     msg_hdr_view(char* base) {
         _storage.bytes = base;
     }
-};
 
-class msg_hdr_cview : public msg_hdr_methods<const_pointer_storage_type> {
-public:
-    msg_hdr_cview(const char* base) {
-        _storage.bytes = base;
+    operator msg_hdr_cview() {
+        return msg_hdr_cview(_storage.bytes);
     }
 };
 
@@ -60,11 +64,18 @@ public:
     }
 
     msg_hdr_view view() {
-        return reinterpret_cast<char *>(this);
+        return reinterpret_cast<char*>(this);
+    }
+
+    operator msg_hdr_view() {
+        return view();
     }
 
     msg_hdr_cview view() const {
         return reinterpret_cast<const char*>(this);
     }
 
+    operator msg_hdr_cview() const {
+        return view();
+    }
 };

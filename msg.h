@@ -20,6 +20,8 @@ public:
 
     bool valid() const;
 
+    bool mutable_valid();
+
     char magic() const {
         return _storage.template read<uint32_t>(offsetof(layout_type, magic));
     }
@@ -56,13 +58,6 @@ protected:
     storage_type _storage;
 };
 
-class msg_view : public msg_methods<pointer_storage_type> {
-public:
-    msg_view(char* base) {
-        _storage.bytes = base;
-    }
-};
-
 class msg_cview : public msg_methods<const_pointer_storage_type> {
 public:
     msg_cview(const char* base) {
@@ -70,17 +65,41 @@ public:
     }
 };
 
+class msg_view : public msg_methods<pointer_storage_type> {
+public:
+    msg_view(char* base) {
+        _storage.bytes = base;
+    }
+
+    operator msg_cview() {
+        return msg_cview(_storage.bytes);
+    }
+};
+
 class msg : public msg_methods<array_storage_type> {
 public:
     msg() {
+        magic(0);
+        header().size(0);
+        header().opcode(0);
+        value1(0.0);
+        value2(0.0);
     }
 
     msg_view view() {
-        return reinterpret_cast<char * const>(this);
+        return reinterpret_cast<char*>(this);
+    }
+
+    operator msg_view() {
+        return view();
     }
 
     msg_cview view() const {
-        return reinterpret_cast<const char* const>(this);
+        return reinterpret_cast<const char*>(this);
+    }
+
+    operator msg_cview() const {
+        return view();
     }
 
 };

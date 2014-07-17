@@ -9,6 +9,7 @@ struct storage_type_ops {
     U read(std::size_t offset) const {
         U u;
         std::memcpy(&u, static_cast<const T&>(*this).view(offset), sizeof(u));
+        return u;
     }
 
     template<typename U>
@@ -50,4 +51,10 @@ struct const_pointer_storage_type : storage_type_ops< const_pointer_storage_type
     const char* view(std::size_t offset = 0) const {
         return bytes + offset;
     }
+
+    const_pointer_storage_type& operator=(pointer_storage_type<T> other) {
+        bytes = other.bytes;
+        return *this;
+    }
+
 };
