@@ -5,6 +5,7 @@
 
 template<typename T>
 struct storage_type_ops {
+
     template<typename U>
     U read(std::size_t offset) const {
         U u;
@@ -16,6 +17,7 @@ struct storage_type_ops {
     void write(std::size_t offset, const U& value) {
         std::memcpy(static_cast<T&>(*this).view(offset), &value, sizeof(value));
     }
+
 };
 
 template<typename T>

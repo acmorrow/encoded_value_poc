@@ -5,14 +5,14 @@
 
 #include "msg.h"
 
-std::ostream& operator<<(std::ostream& os, const msg_cview msg) {
+std::ostream& operator<<(std::ostream& os, msg_cview msg) {
     os << "msg.header: " << msg.header() << "\n"
        << "msg.value1: " << msg.value1() << "\n"
        << "msg.value2: "<< msg.value2() << "\n";
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const msg_hdr_cview msg_hdr) {
+std::ostream& operator<<(std::ostream& os, msg_hdr_cview msg_hdr) {
     os << "msg.magic: " << int(msg_hdr.magic()) << "\n"
        << "hdr.size: " << msg_hdr.size() << "\n"
        << "hdr.opcode: "<< msg_hdr.opcode() << "\n";

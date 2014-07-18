@@ -13,54 +13,51 @@ struct msg_hdr_layout_t {
 #pragma pack(pop)
 
 template<template<typename> class storage_type_t>
-class msg_hdr_field_access {
+class msg_hdr_const_methods {
+public:
 
     typedef msg_hdr_layout_t layout_type;
     typedef storage_type_t<layout_type> storage_type;
 
-public:
-
     char magic() const {
-        return _storage.template read<uint32_t>(offsetof(layout_type, magic));
-    }
-
-    void magic(char value) {
-        return _storage.write(offsetof(layout_type, magic), value);
+        return this->_storage.template read<uint32_t>(offsetof(layout_type, magic));
     }
 
     uint32_t size() const {
-        return _storage.template read<uint32_t>(offsetof(layout_type, size));
-    }
-
-    void size(uint32_t value) {
-        return _storage.write(offsetof(layout_type, size), value);
+        return this->_storage.template read<uint32_t>(offsetof(layout_type, size));
     }
 
     uint16_t opcode() const {
-        return _storage.template read<uint16_t>(offsetof(layout_type, opcode));
+        return this->_storage.template read<uint16_t>(offsetof(layout_type, opcode));
     }
 
-    void opcode(uint16_t value) {
-        return _storage.write(offsetof(layout_type, opcode), value);
-    }
+    void check_magic() const;
 
 protected:
     storage_type _storage;
 };
 
-// USER
-template<template<typename> class storage_type_t>
-class msg_hdr_const_methods : public msg_hdr_field_access<storage_type_t> {
-public:
-    void check_magic() const;
-};
-
-// USER
 template<template<typename> class storage_type_t>
 class msg_hdr_methods : public msg_hdr_const_methods<storage_type_t> {
+public:
+
+    typedef msg_hdr_const_methods<storage_type_t> base;
+    using typename base::layout_type;
+
+    void magic(char value) {
+        return this->_storage.write(offsetof(layout_type, magic), value);
+    }
+
+    void size(uint32_t value) {
+        return this->_storage.write(offsetof(layout_type, size), value);
+    }
+
+    void opcode(uint16_t value) {
+        return this->_storage.write(offsetof(layout_type, opcode), value);
+    }
+
 };
 
-// MACRO GENERATED
 class msg_hdr_cview : public msg_hdr_const_methods<const_pointer_storage_type> {
 public:
     msg_hdr_cview(const char* base) {
@@ -73,7 +70,6 @@ private:
     msg_hdr_cview* operator&() const;
 };
 
-// MACRO GENERATED
 class msg_hdr_view : public msg_hdr_methods<pointer_storage_type> {
 public:
     msg_hdr_view(char* base) {
@@ -90,7 +86,6 @@ private:
     msg_hdr_view* operator&() const;
 };
 
-// MACRO GENERATED
 class msg_hdr : public msg_hdr_methods<array_storage_type> {
 public:
     msg_hdr_view view() {
