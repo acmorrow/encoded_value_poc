@@ -5,7 +5,7 @@
 // GENERATED
 #pragma pack(push, 1)
 struct msg_layout_t {
-    char magic;
+    char reserved[4];
     msg_hdr_layout_t header;
     double value1;
     double value2;
@@ -20,14 +20,6 @@ class msg_field_access {
     typedef storage_type_t<layout_type> storage_type;
 
 public:
-
-    char magic() const {
-        return _storage.template read<uint32_t>(offsetof(layout_type, magic));
-    }
-
-    void magic(char value) {
-        return _storage.write(offsetof(layout_type, magic), value);
-    }
 
     msg_hdr_view header() {
         return _storage.view(offsetof(layout_type, header));
@@ -67,7 +59,7 @@ public:
 template<template<typename> class storage_type_t>
 class msg_methods : public msg_const_methods<storage_type_t> {
 public:
-    bool mutable_valid();
+    bool swap_if_valid();
 };
 
 // MACRO GENERATED
@@ -76,6 +68,10 @@ public:
     msg_cview(const char* base) {
         _storage.bytes = base;
     }
+private:
+    // MAYBE
+    msg_cview* operator&();
+    msg_cview* operator&() const;
 };
 
 // MACRO GENERATED
@@ -88,12 +84,18 @@ public:
     operator msg_cview() {
         return msg_cview(_storage.bytes);
     }
+
+private:
+    // MAYBE
+    msg_view* operator&();
+    msg_view* operator&() const;
 };
 
 // MACRO GENERATED
 class msg : public msg_methods<array_storage_type> {
 public:
     msg_view view() {
+        // TODO: static_assert sizes
         return reinterpret_cast<char*>(this);
     }
 
@@ -102,6 +104,7 @@ public:
     }
 
     msg_cview view() const {
+        // TODO: static_assert sizes
         return reinterpret_cast<const char*>(this);
     }
 

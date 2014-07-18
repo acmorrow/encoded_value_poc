@@ -6,6 +6,7 @@
 
 #pragma pack(push, 1)
 struct msg_hdr_layout_t {
+    uint8_t  magic;
     uint32_t size;
     uint16_t opcode;
 };
@@ -18,6 +19,14 @@ class msg_hdr_field_access {
     typedef storage_type_t<layout_type> storage_type;
 
 public:
+
+    char magic() const {
+        return _storage.template read<uint32_t>(offsetof(layout_type, magic));
+    }
+
+    void magic(char value) {
+        return _storage.write(offsetof(layout_type, magic), value);
+    }
 
     uint32_t size() const {
         return _storage.template read<uint32_t>(offsetof(layout_type, size));
@@ -42,6 +51,8 @@ protected:
 // USER
 template<template<typename> class storage_type_t>
 class msg_hdr_const_methods : public msg_hdr_field_access<storage_type_t> {
+public:
+    void check_magic() const;
 };
 
 // USER
@@ -55,6 +66,11 @@ public:
     msg_hdr_cview(const char* base) {
         _storage.bytes = base;
     }
+
+private:
+    // MAYBE
+    msg_hdr_cview* operator&();
+    msg_hdr_cview* operator&() const;
 };
 
 // MACRO GENERATED
@@ -67,12 +83,18 @@ public:
     operator msg_hdr_cview() {
         return msg_hdr_cview(_storage.bytes);
     }
+
+private:
+    // MAYBE
+    msg_hdr_view* operator&();
+    msg_hdr_view* operator&() const;
 };
 
 // MACRO GENERATED
 class msg_hdr : public msg_hdr_methods<array_storage_type> {
 public:
     msg_hdr_view view() {
+        // TODO: static_assert sizes
         return reinterpret_cast<char*>(this);
     }
 
@@ -81,6 +103,7 @@ public:
     }
 
     msg_hdr_cview view() const {
+        // TODO: static_assert sizes
         return reinterpret_cast<const char*>(this);
     }
 

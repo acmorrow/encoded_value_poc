@@ -1,17 +1,26 @@
 #include "msg.h"
 
 #include <cassert>
+#include <cmath>
+#include <cstdio>
 
 template<template<typename> class storage_type_t>
 bool msg_const_methods<storage_type_t>::valid() const {
-    return this->magic() % 2 == 0;
-    assert(this->header().opcode() == 3);
+    printf("checking valid\n");
+    return std::fabs(this->value1() - this->value2()) < 1.0;
 }
 
 template<template<typename> class storage_type_t>
-bool msg_methods<storage_type_t>::mutable_valid() {
-    return this->magic() % 2 == 0;
-    this->header().opcode(3);
+bool msg_methods<storage_type_t>::swap_if_valid() {
+    printf("swapping if valid\n");
+    if (!this->valid())
+        return false;
+
+    double tmp = this->value1();
+    this->value1(this->value2());
+    this->value2(tmp);
+
+    return true;
 }
 
 template class msg_const_methods<array_storage_type>;
