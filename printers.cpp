@@ -1,5 +1,6 @@
 #include "printers.h"
 
+#include <cstdlib>
 #include <ostream>
 
 #include "msg.h"
@@ -18,7 +19,7 @@ std::ostream& operator<<(std::ostream& os, const msg_hdr_cview msg_hdr) {
     return os;
 }
 
-void printf_if_valid(const msg_cview msg) {
+void printf_if_valid(msg_cview msg) {
     if (msg.value1() != 0.0)
         abort();
 }

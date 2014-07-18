@@ -12,7 +12,8 @@ struct msg_hdr_layout_t {
 #pragma pack(pop)
 
 template<template<typename> class storage_type_t>
-class msg_hdr_methods {
+class msg_hdr_field_access {
+
     typedef msg_hdr_layout_t layout_type;
     typedef storage_type_t<layout_type> storage_type;
 
@@ -38,13 +39,25 @@ protected:
     storage_type _storage;
 };
 
-class msg_hdr_cview : public msg_hdr_methods<const_pointer_storage_type> {
+// USER
+template<template<typename> class storage_type_t>
+class msg_hdr_const_methods : public msg_hdr_field_access<storage_type_t> {
+};
+
+// USER
+template<template<typename> class storage_type_t>
+class msg_hdr_methods : public msg_hdr_const_methods<storage_type_t> {
+};
+
+// MACRO GENERATED
+class msg_hdr_cview : public msg_hdr_const_methods<const_pointer_storage_type> {
 public:
     msg_hdr_cview(const char* base) {
         _storage.bytes = base;
     }
 };
 
+// MACRO GENERATED
 class msg_hdr_view : public msg_hdr_methods<pointer_storage_type> {
 public:
     msg_hdr_view(char* base) {
@@ -56,13 +69,9 @@ public:
     }
 };
 
+// MACRO GENERATED
 class msg_hdr : public msg_hdr_methods<array_storage_type> {
 public:
-    msg_hdr() {
-        size(0);
-        opcode(0);
-    }
-
     msg_hdr_view view() {
         return reinterpret_cast<char*>(this);
     }

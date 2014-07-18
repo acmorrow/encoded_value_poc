@@ -2,6 +2,7 @@
 
 #include "msg_hdr.h"
 
+// GENERATED
 #pragma pack(push, 1)
 struct msg_layout_t {
     char magic;
@@ -11,16 +12,14 @@ struct msg_layout_t {
 };
 #pragma pack(pop)
 
+// GENERATED
 template<template<typename> class storage_type_t>
-class msg_methods {
+class msg_field_access {
+
     typedef msg_layout_t layout_type;
     typedef storage_type_t<layout_type> storage_type;
 
 public:
-
-    bool valid() const;
-
-    bool mutable_valid();
 
     char magic() const {
         return _storage.template read<uint32_t>(offsetof(layout_type, magic));
@@ -58,13 +57,28 @@ protected:
     storage_type _storage;
 };
 
-class msg_cview : public msg_methods<const_pointer_storage_type> {
+// USER
+template<template<typename> class storage_type_t>
+class msg_const_methods : public msg_field_access<storage_type_t> {
+public:
+    bool valid() const;
+};
+
+template<template<typename> class storage_type_t>
+class msg_methods : public msg_const_methods<storage_type_t> {
+public:
+    bool mutable_valid();
+};
+
+// MACRO GENERATED
+class msg_cview : public msg_const_methods<const_pointer_storage_type> {
 public:
     msg_cview(const char* base) {
         _storage.bytes = base;
     }
 };
 
+// MACRO GENERATED
 class msg_view : public msg_methods<pointer_storage_type> {
 public:
     msg_view(char* base) {
@@ -76,16 +90,9 @@ public:
     }
 };
 
+// MACRO GENERATED
 class msg : public msg_methods<array_storage_type> {
 public:
-    msg() {
-        magic(0);
-        header().size(0);
-        header().opcode(0);
-        value1(0.0);
-        value2(0.0);
-    }
-
     msg_view view() {
         return reinterpret_cast<char*>(this);
     }
