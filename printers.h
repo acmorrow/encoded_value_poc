@@ -1,26 +1,29 @@
 #include <iosfwd>
 
-class msg_hdr;
-class msg_hdr_view;
-class msg_hdr_cview;
+namespace msg_hdr {
+    class value;
+    class view;
+    class cview;
+}
 
-class msg;
-class msg_view;
-class msg_cview;
+namespace msg {
+    class value;
+    class view;
+    class cview;
+}
 
+std::ostream& operator<<(std::ostream& os, msg::cview msg);
+std::ostream& operator<<(std::ostream& os, msg_hdr::cview msg_hdr);
 
-std::ostream& operator<<(std::ostream& os, msg_cview msg);
-std::ostream& operator<<(std::ostream& os, msg_hdr_cview msg_hdr);
+void check_magic_val(msg_hdr::value& msg_hdr);
+void check_magic_cval(const msg_hdr::value& msg_hdr);
+void check_magic_view(msg_hdr::view msg_hdr);
+void check_magic_cview(msg_hdr::cview msg_hdr);
 
-void check_magic_val(msg_hdr& msg_hdr);
-void check_magic_cval(const msg_hdr& msg_hdr);
-void check_magic_view(msg_hdr_view msg_hdr);
-void check_magic_cview(msg_hdr_cview msg_hdr);
+bool validate_val(msg::value& msg);
+bool validate_cval(const msg::value& msg);
+bool validate_view(msg::view msg);
+bool validate_cview(msg::cview msg);
 
-bool validate_val(msg& msg);
-bool validate_cval(const msg& msg);
-bool validate_view(msg_view msg);
-bool validate_cview(msg_cview msg);
-
-bool swap_if_valid_val(msg& msg);
-bool swap_if_valid_view(msg_view msg);
+bool swap_if_valid_val(msg::value& msg);
+bool swap_if_valid_view(msg::view msg);
