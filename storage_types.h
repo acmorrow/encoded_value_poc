@@ -52,9 +52,4 @@ struct const_pointer_storage_type : storage_type_ops< const_pointer_storage_type
         return bytes + offset;
     }
 
-    const_pointer_storage_type& operator=(pointer_storage_type<T> other) {
-        bytes = other.bytes;
-        return *this;
-    }
-
 };
