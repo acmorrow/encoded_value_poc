@@ -2,8 +2,7 @@
 
 #include <stdint.h>
 
-#include "storage_types.h"
-#include "macros.h"
+#include "encoded_value.h"
 
 #pragma pack(1)
 struct msg_hdr_layout_t {

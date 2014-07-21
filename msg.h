@@ -1,6 +1,7 @@
 #pragma once
 
 #include "msg_hdr.h"
+#include "encoded_value.h"
 
 #pragma pack(1)
 struct msg_layout_t {
