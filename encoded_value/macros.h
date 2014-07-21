@@ -1,7 +1,5 @@
 #pragma once
 
-#include "view_types.h"
-
 #if __cplusplus >= 201103L
 #  define EV_DECLTYPE decltype
 #elif defined(__GNUC__)
@@ -28,31 +26,31 @@
     namespace name { \
         typedef layout layout_type; \
 
-#define EV_DECL_CONST_VIEWS_AND_VALUES_BEGIN \
-    template <template<typename> class storage_type_t> \
-    class _const_methods { \
+#define EV_DECL_CONST_METHODS_BEGIN \
+    template <class storage_type_t> \
+    class const_methods { \
     protected: \
-        storage_type_t<layout_type> _storage; \
+        storage_type_t _storage; \
     private:
 
-#define EV_DECL_CONST_VIEWS_AND_VALUES_END };
+#define EV_DECL_CONST_METHODS_END };
         
-#define EV_DECL_VIEWS_AND_VALUES_BEGIN \
-    template <template<typename> class storage_type_t> \
-    class _mutable_methods : public _const_methods<storage_type_t> { \
-        typedef _const_methods<storage_type_t> base; \
+#define EV_DECL_MUTABLE_METHODS_BEGIN \
+    template <class storage_type_t> \
+    class mutable_methods : public const_methods<storage_type_t> { \
+        typedef const_methods<storage_type_t> base; \
     private:
 
-#define EV_DECL_VIEWS_AND_VALUES_END };
+#define EV_DECL_MUTABLE_METHODS_END };
 
 #define EV_DECL_CLASS_END \
-    class cview : public _const_methods<encoded_value::const_pointer_storage_type> { \
+    class cview : public const_methods<encoded_value::const_pointer_storage_type<layout_type> > { \
     public: \
         cview(const char* base) { \
             _storage.bytes = base; \
         } \
     }; \
-    class view : public _mutable_methods<encoded_value::pointer_storage_type> { \
+    class view : public mutable_methods<encoded_value::pointer_storage_type<layout_type> > { \
     public: \
         view(char* base) { \
             _storage.bytes = base; \
@@ -61,7 +59,7 @@
             return cview(_storage.bytes); \
         } \
     }; \
-    class value : public _mutable_methods<encoded_value::array_storage_type> { \
+    class value : public mutable_methods<encoded_value::array_storage_type<layout_type> > { \
     public: \
         value() { } \
         value(uint8_t x) { \
@@ -116,31 +114,26 @@
     }
 
 #define EV_DECL_ARRAY_MUTATOR(name) \
+    using base::name; \
     void name(std::size_t n, EV_DECLTYPE_MEMBER(name[0]) value) { \
         return this->_storage.write(EV_OFFSETOF(name[n]), value); \
     }
 
 #define EV_DECL_RAW_MUTATOR(name) \
+    using base::name; \
     char * name() { \
         return this->_storage.view(EV_OFFSETOF(name)); \
     }
 
 #define EV_DECL_VIEW_MUTATOR(name) \
+    using base::name; \
     encoded_value::layout2view<EV_DECLTYPE_MEMBER(name)>::view name() { \
         return this->_storage.view(EV_OFFSETOF(name)); \
     }
 
-#define EV_CONST_METHOD_IMPL(rtype, name) \
-    template <template<typename> class storage_type_t> \
-    rtype name::_const_methods<storage_type_t>
-
-#define EV_METHOD_IMPL(rtype, name) \
-    template <template<typename> class storage_type_t> \
-    rtype name::_mutable_methods<storage_type_t>
-
 #define EV_INSTANTIATE(name) \
-    template class name::_const_methods<encoded_value::array_storage_type>; \
-    template class name::_mutable_methods<encoded_value::array_storage_type>; \
-    template class name::_const_methods<encoded_value::pointer_storage_type>; \
-    template class name::_mutable_methods<encoded_value::pointer_storage_type>; \
-    template class name::_const_methods<encoded_value::const_pointer_storage_type>;
+    template class name::const_methods<encoded_value::array_storage_type<name::layout_type> >; \
+    template class name::mutable_methods<encoded_value::array_storage_type<name::layout_type> >; \
+    template class name::const_methods<encoded_value::pointer_storage_type<name::layout_type> >; \
+    template class name::mutable_methods<encoded_value::pointer_storage_type<name::layout_type> >; \
+    template class name::const_methods<encoded_value::const_pointer_storage_type<name::layout_type> >;

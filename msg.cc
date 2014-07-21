@@ -6,13 +6,15 @@
 
 // Can write out-of-line methods
 
-EV_CONST_METHOD_IMPL(bool, msg)::valid() const {
+template <class T>
+bool msg::const_methods<T>::valid() const {
     printf("checking valid\n");
     // Can call const from const
     return std::fabs(value1() - value2()) < 1.0;
 }
 
-EV_METHOD_IMPL(bool, msg)::swap_if_valid() {
+template <class T>
+bool msg::mutable_methods<T>::swap_if_valid() {
     printf("swapping if valid\n");
     // Can call const from non-const
     if (this->valid())
