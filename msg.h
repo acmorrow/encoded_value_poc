@@ -15,7 +15,7 @@ class msg_cview {
 
 public:
     typedef msg_layout_t layout_type;
-    typedef const_pointer_storage_type<layout_type> pointer_type;
+    typedef const_pointer_view view_type;
 
     msg_cview(const char* data)
         : _data(data) {}
@@ -39,19 +39,19 @@ public:
     bool valid() const;
 
 protected:
-    const pointer_type& data() const {
+    const view_type& data() const {
         return _data;
     }
 
 private:
-    const pointer_type _data;
+    const view_type _data;
 };
 
 class msg_view : public msg_cview {
 public:
 
     using typename msg_cview::layout_type;
-    typedef pointer_storage_type<layout_type> pointer_type;
+    typedef pointer_view view_type;
 
     msg_view(char* data)
         : msg_cview(data) {}
@@ -79,7 +79,7 @@ public:
     bool swap_if_valid();
 
 private:
-    pointer_type data() const {
+    view_type data() const {
         return const_cast<char*>(msg_cview::view2ptr());
     }
 };

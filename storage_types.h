@@ -3,55 +3,42 @@
 #include <cstddef>
 #include <cstring>
 
-template<typename T>
-struct storage_type_ops {
-
-
-    template<typename U>
-    U read(std::size_t offset) const {
-        U u;
-        std::memcpy(&u, static_cast<const T&>(*this).view(offset), sizeof(u));
-        return u;
+class const_pointer_view {
+public:
+    const_pointer_view(const char* bytes)
+        : bytes(bytes) {
     }
 
-    template<typename U>
-    void write(std::size_t offset, const U& value) {
-        std::memcpy(static_cast<T&>(*this).view(offset), &value, sizeof(value));
+    const char* view(std::size_t offset = 0) const {
+        return bytes + offset;
     }
 
+    template<typename T>
+    T read(std::size_t offset) const {
+        T t;
+        std::memcpy(&t, view(offset), sizeof(t));
+        return t;
+    }
+
+private:
+    const char* const bytes;
 };
 
-template<typename T>
-struct pointer_storage_type : storage_type_ops< pointer_storage_type<T> > {
-    char* bytes;
+struct pointer_view : public const_pointer_view {
 
-    pointer_storage_type() {
+    pointer_view(char* bytes)
+        : const_pointer_view(bytes) {
     }
-
-    pointer_storage_type(char* bytes)
-        : bytes(bytes) {}
 
     char* view(std::size_t offset = 0) {
-        return bytes + offset;
+        // It is safe to cast away const here since the pointer stored in our base class was
+        // originally non-const by way of our constructor.
+        return const_cast<char*>(const_pointer_view::view(offset));
     }
 
-    const char* view(std::size_t offset = 0) const {
-        return bytes + offset;
-    }
-};
-
-template<typename T>
-struct const_pointer_storage_type : storage_type_ops< const_pointer_storage_type<T> > {
-    const char* bytes;
-
-    const_pointer_storage_type() {
-    }
-
-    const_pointer_storage_type(const char* bytes)
-        : bytes(bytes) {}
-
-    const char* view(std::size_t offset = 0) const {
-        return bytes + offset;
+    template<typename T>
+    void write(std::size_t offset, const T& value) {
+        std::memcpy(view(offset), &value, sizeof(value));
     }
 };
 
