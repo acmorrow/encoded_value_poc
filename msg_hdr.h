@@ -24,7 +24,8 @@ public:
     typedef const_pointer_view view_type;
 
     msg_hdr_cview(const char* data)
-        : _data(data) {}
+        : _data(data) {
+    }
 
     const char* view2ptr() const {
         return data().view();
