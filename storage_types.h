@@ -42,7 +42,11 @@ struct pointer_view : public const_pointer_view {
     }
 };
 
-struct zero_init_tag_t {};
+struct zero_init_tag_t{
+    zero_init_tag_t() {
+    };
+};
+
 const zero_init_tag_t zero_init_tag;
 
 template<typename layout_type, typename cview_type, typename view_type>
@@ -52,7 +56,7 @@ public:
     value_storage() {
     }
 
-    value_storage(zero_init_tag_t) {
+    explicit value_storage(zero_init_tag_t) {
         std::memset(_data, 0, sizeof(_data));
     }
 

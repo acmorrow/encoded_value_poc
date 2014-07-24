@@ -109,7 +109,7 @@ public:
     msg_hdr() {
     }
 
-    msg_hdr(zero_init_tag_t zit)
+    explicit msg_hdr(zero_init_tag_t zit)
         : value_storage<msg_hdr_layout_t, msg_hdr_cview, msg_hdr_view>(zit) {
     }
 

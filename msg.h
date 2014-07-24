@@ -94,7 +94,7 @@ public:
     msg() {
     }
 
-    msg(zero_init_tag_t zit)
+    explicit msg(zero_init_tag_t zit)
         : value_storage<msg_layout_t, msg_cview, msg_view>(zit) {
     }
 
