@@ -29,6 +29,7 @@ void check_magic_cval(const msg_hdr& msg_hdr) {
 
 void check_magic_view(msg_hdr_view msg_hdr) {
     msg_hdr.check_magic();
+    msg_hdr.magic();
 }
 
 void check_magic_cview(msg_hdr_cview msg_hdr) {
