@@ -2,6 +2,10 @@
 
 #include "msg_hdr.h"
 
+//
+// See msg_hdr.h for an overview of the technique used in this file.
+//
+
 #pragma pack(push, 1)
     struct msg_layout_t {
         char reserved[4];
@@ -12,8 +16,8 @@
 #pragma pack(pop)
 
 class msg_cview {
-
 public:
+
     typedef msg_layout_t layout_type;
     typedef const_pointer_view view_type;
 
@@ -84,51 +88,30 @@ private:
     }
 };
 
-class msg {
+class msg : public value_storage<msg_layout_t, msg_cview, msg_view> {
 public:
-    typedef msg_cview::layout_type layout_type;
 
     msg() {
     }
 
-    msg(zero_init_tag_t) {
-        std::memset(&_data, 0, sizeof(_data));
-    }
-
-    msg_view view() {
-        return _data;
-    }
-
-    msg_cview cview() {
-        return _data;
-    }
-
-    msg_cview view() const {
-        return _data;
-    }
-
-    operator msg_view() {
-        return view();
-    }
-
-    operator msg_cview() const {
-        return view();
+    msg(zero_init_tag_t zit)
+        : value_storage<msg_layout_t, msg_cview, msg_view>(zit) {
     }
 
     msg_hdr_cview header() const {
-        return view().header();
+        return cview().header();
     }
 
     double value1() const {
-        return view().value1();
+        return cview().value1();
     }
 
     double value2() const {
-        return view().value2();
+        return cview().value2();
     }
 
     bool valid() const {
-        return view().valid();
+        return cview().valid();
     }
 
     msg_hdr_view header() {
@@ -146,7 +129,4 @@ public:
     bool swap_if_valid() {
         return view().swap_if_valid();
     }
-
-private:
-    char _data[sizeof(layout_type)];
 };

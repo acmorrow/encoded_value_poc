@@ -19,6 +19,7 @@
 // memory which we are interpreting as having the same structure as a msg_hdr_layout_t.
 class msg_hdr_cview {
 public:
+
     typedef msg_hdr_layout_t layout_type;
     typedef const_pointer_view view_type;
 
@@ -94,58 +95,37 @@ private:
     }
 };
 
-// This is the (optional) value type. It owns a chunk of bytes sufficient to hold the fields
-// specified by our layout type. It re-iterates the methods of the constant and non-constant
-// views allowing us to invoke them like normal accessors, mutators, and methods. However, all
-// of the methods simply delegate to the view types, instantiated over the underlying
-// storage. This way, we only write the methods once. Writing the forwarding methods is
-// optional. It is equally valid to require users to always invoke .view() and then call the
-// intended method.
-class msg_hdr {
+// This is the (optional) value type. It owns, via the value_storage base class, a chunk of
+// bytes sufficient to hold the fields specified by our layout type. It re-iterates the methods
+// of the constant and non-constant views allowing us to invoke them like normal accessors,
+// mutators, and methods. However, all of the methods simply delegate to the view types,
+// instantiated over the underlying storage. This way, we only write the methods once. Writing
+// the forwarding methods is optional. It is equally valid to require users to always invoke
+// .view() and then call the intended method.
+class msg_hdr : public value_storage<msg_hdr_layout_t, msg_hdr_cview, msg_hdr_view> {
 public:
-    typedef msg_hdr_cview::layout_type layout_type;
 
     msg_hdr() {
     }
 
-    msg_hdr(zero_init_tag_t) {
-        std::memset(_data, 0, sizeof(_data));
-    }
-
-    msg_hdr_view view() {
-        return _data;
-    }
-
-    msg_hdr_cview cview() {
-        return _data;
-    }
-
-    msg_hdr_cview view() const {
-        return _data;
-    }
-
-    operator msg_hdr_view() {
-        return view();
-    }
-
-    operator msg_hdr_cview() const {
-        return view();
+    msg_hdr(zero_init_tag_t zit)
+        : value_storage<msg_hdr_layout_t, msg_hdr_cview, msg_hdr_view>(zit) {
     }
 
     char magic() const {
-        return view().magic();
+        return cview().magic();
     }
 
     uint32_t size() const {
-        return view().magic();
+        return cview().magic();
     }
 
     uint16_t opcode() const {
-        return view().magic();
+        return cview().magic();
     }
 
     void check_magic() const {
-        return view().check_magic();
+        return cview().check_magic();
     }
 
     void magic(char value) {
@@ -159,7 +139,4 @@ public:
     void opcode(uint16_t value) {
         return view().opcode(value);
     }
-
-private:
-    char _data[sizeof(layout_type)];
 };

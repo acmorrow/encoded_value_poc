@@ -44,3 +44,34 @@ struct pointer_view : public const_pointer_view {
 
 struct zero_init_tag_t {};
 const zero_init_tag_t zero_init_tag;
+
+template<typename layout_type, typename cview_type, typename view_type>
+class value_storage {
+public:
+
+    value_storage() {
+    }
+
+    value_storage(zero_init_tag_t) {
+        std::memset(_data, 0, sizeof(_data));
+    }
+
+    view_type view() {
+        return _data;
+    }
+
+    cview_type cview() const {
+        return _data;
+    }
+
+    operator view_type() {
+        return view();
+    }
+
+    operator cview_type() const {
+        return cview();
+    }
+
+private:
+    char _data[sizeof(layout_type)];
+};
