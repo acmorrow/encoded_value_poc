@@ -21,7 +21,7 @@ public:
         : _data(data) {}
 
     const char* view2ptr() const {
-        return data().bytes;
+        return data().view();
     }
 
     msg_hdr_cview header() const {
@@ -29,11 +29,11 @@ public:
     }
 
     double value1() const {
-        return data().template read<double>(offsetof(layout_type, value1));
+        return data().read<double>(offsetof(layout_type, value1));
     }
 
     double value2() const {
-        return data().template read<double>(offsetof(layout_type, value2));
+        return data().read<double>(offsetof(layout_type, value2));
     }
 
     bool valid() const;
@@ -58,7 +58,7 @@ public:
 
     using msg_cview::view2ptr;
     char* view2ptr() {
-        return data().bytes;
+        return data().view();
     }
 
     using msg_cview::header;
@@ -93,6 +93,18 @@ public:
 
     msg(zero_init_tag_t) {
         std::memset(&_data, 0, sizeof(_data));
+    }
+
+    msg_view view() {
+        return _data;
+    }
+
+    msg_cview cview() {
+        return _data;
+    }
+
+    msg_cview view() const {
+        return _data;
     }
 
     operator msg_view() {
@@ -136,13 +148,5 @@ public:
     }
 
 private:
-    msg_view view() {
-        return _data;
-    }
-
-    msg_cview view() const {
-        return _data;
-    }
-
     char _data[sizeof(layout_type)];
 };

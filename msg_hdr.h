@@ -21,19 +21,19 @@ public:
         : _data(data) {}
 
     const char* view2ptr() const {
-        return data().bytes;
+        return data().view();
     }
 
-    char magic() const {
-        return data().template read<uint32_t>(offsetof(layout_type, magic));
+    uint8_t magic() const {
+        return data().read<uint8_t>(offsetof(layout_type, magic));
     }
 
     uint32_t size() const {
-        return data().template read<uint32_t>(offsetof(layout_type, size));
+        return data().read<uint32_t>(offsetof(layout_type, size));
     }
 
     uint16_t opcode() const {
-        return data().template read<uint16_t>(offsetof(layout_type, opcode));
+        return data().read<uint16_t>(offsetof(layout_type, opcode));
     }
 
     void check_magic() const;
@@ -59,7 +59,7 @@ public:
 
     using msg_hdr_cview::view2ptr;
     char* view2ptr() {
-        return data().bytes;
+        return data().view();
     }
 
     using msg_hdr_cview::magic;
@@ -92,6 +92,18 @@ public:
 
     msg_hdr(zero_init_tag_t) {
         std::memset(_data, 0, sizeof(_data));
+    }
+
+    msg_hdr_view view() {
+        return _data;
+    }
+
+    msg_hdr_cview cview() {
+        return _data;
+    }
+
+    msg_hdr_cview view() const {
+        return _data;
     }
 
     operator msg_hdr_view() {
@@ -131,13 +143,5 @@ public:
     }
 
 private:
-    msg_hdr_view view() {
-        return _data;
-    }
-
-    msg_hdr_cview view() const {
-        return _data;
-    }
-
     char _data[sizeof(layout_type)];
 };
