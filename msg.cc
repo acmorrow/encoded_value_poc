@@ -5,7 +5,7 @@
 #include <cstdio>
 
 bool msg_cview::valid() const {
-    const bool near =  std::fabs(value1() - value2()) < 1.0;
+    const bool near = std::fabs(value1() - value2()) < 1.0;
     const bool same_sign = ((value1() < 0.0) == (value2() < 0.0));
     return near && same_sign;
 }

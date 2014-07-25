@@ -10,8 +10,8 @@
 #pragma pack(push, 1)
     struct msg_hdr_layout_t {
         uint8_t  magic;
-        uint32_t size;
-        uint16_t opcode;
+        uint32_t size; // big endian
+        uint16_t opcode; // big endian
     };
 #pragma pack(pop)
 
@@ -36,11 +36,11 @@ public:
     }
 
     uint32_t size() const {
-        return data().read<uint32_t>(offsetof(layout_type, size));
+        return data().read_be<uint32_t>(offsetof(layout_type, size));
     }
 
     uint16_t opcode() const {
-        return data().read<uint16_t>(offsetof(layout_type, opcode));
+        return data().read_be<uint16_t>(offsetof(layout_type, opcode));
     }
 
     void check_magic() const;
@@ -80,12 +80,12 @@ public:
 
     using msg_hdr_cview::size;
     void size(uint32_t value) {
-        return data().write(offsetof(layout_type, size), value);
+        return data().write_be(offsetof(layout_type, size), value);
     }
 
     using msg_hdr_cview::opcode;
     void opcode(uint16_t value) {
-        return data().write(offsetof(layout_type, opcode), value);
+        return data().write_be(offsetof(layout_type, opcode), value);
     }
 
 private:

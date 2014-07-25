@@ -10,8 +10,8 @@
     struct msg_layout_t {
         char reserved[4];
         msg_hdr_layout_t header;
-        double value1;
-        double value2;
+        double value1; // little endian
+        double value2; // big endian
     };
 #pragma pack(pop)
 
@@ -33,11 +33,11 @@ public:
     }
 
     double value1() const {
-        return data().read<double>(offsetof(layout_type, value1));
+        return data().read_le<double>(offsetof(layout_type, value1));
     }
 
     double value2() const {
-        return data().read<double>(offsetof(layout_type, value2));
+        return data().read_be<double>(offsetof(layout_type, value2));
     }
 
     bool valid() const;
@@ -72,12 +72,12 @@ public:
 
     using msg_cview::value1;
     void value1(double value) {
-        return data().write(offsetof(layout_type, value1), value);
+        return data().write_le(offsetof(layout_type, value1), value);
     }
 
     using msg_cview::value2;
     void value2(double value) {
-        return data().write(offsetof(layout_type, value2), value);
+        return data().write_be(offsetof(layout_type, value2), value);
     }
 
     bool swap_if_valid();

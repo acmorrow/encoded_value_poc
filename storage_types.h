@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstring>
 
+#include "endian.h"
+
 class const_pointer_view {
 public:
     const_pointer_view(const char* bytes)
@@ -18,6 +20,16 @@ public:
         T t;
         std::memcpy(&t, view(offset), sizeof(t));
         return t;
+    }
+
+    template<typename T>
+    T read_le(std::size_t offset) const {
+        return little_to_native(read<T>(offset));
+    }
+
+    template<typename T>
+    T read_be(std::size_t offset) const {
+        return big_to_native(read<T>(offset));
     }
 
 private:
@@ -40,6 +52,17 @@ struct pointer_view : public const_pointer_view {
     void write(std::size_t offset, const T& value) {
         std::memcpy(view(offset), &value, sizeof(value));
     }
+
+    template<typename T>
+    void write_le(std::size_t offset, const T& value) {
+        return write(offset, native_to_little(value));
+    }
+
+    template<typename T>
+    void write_be(std::size_t offset, const T& value) {
+        return write(offset, native_to_big(value));
+    }
+
 };
 
 struct zero_init_tag_t{
